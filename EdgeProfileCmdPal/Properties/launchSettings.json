@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "EdgeProfileCmdPal (Package)": {
+      "commandName": "MsixPackage",
+      "doNotLaunchApp": true
+    },
+    "EdgeProfileCmdPal (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
