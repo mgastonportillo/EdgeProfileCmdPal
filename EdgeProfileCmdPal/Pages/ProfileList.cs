@@ -1,4 +1,5 @@
 using EdgeProfileCmdPal.Commands;
+using EdgeProfileCmdPal.Helpers;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 using System;
@@ -51,30 +52,31 @@ internal sealed partial class ProfileList : ListPage
                     string profilePath = profile.Name;
                     string profileDir = Path.Combine(edgeDataFolder, profilePath);
 
-                    // Verify the profile directory exists
                     if (!Directory.Exists(profileDir))
                     {
-                        return null; // Skip non-existent profiles
+                        return null; // Skip profiles without a valid directory
                     }
 
                     var profileData = profile.Value;
                     string profileName = profileData.GetProperty("name").GetString() ?? profilePath;
 
-                    // Handle iconFileName nullability
+                    // Handle icon
                     string iconFileName = profileData.TryGetProperty("gaia_picture_file_name", out var iconProp) && iconProp.ValueKind == JsonValueKind.String
                         ? iconProp.GetString() ?? "Edge Profile Picture.png"
                         : "Edge Profile Picture.png";
                     string iconPath = Path.Combine(profileDir, iconFileName);
+                    string roundIconPath = ImageHelpers.ClipToCircle(iconPath);
+                    var profileIcon = new IconInfo(roundIconPath);
 
                     return new ListItem(new OpenCommand(profilePath))
                     {
                         Title = profileName,
                         Subtitle = profilePath,
-                        Icon = new IconInfo(iconPath)
+                        Icon = profileIcon
                     };
                 })
                 .Where(item => item != null) // Remove null entries
-                .Cast<ListItem>() // Cast as List<ListItem> (temporary)
+                .Cast<ListItem>() // Cast as List<ListItem> (probably unsafe)
                 .ToList();
 
             var filteredItems = ListHelpers.FilterList(profiles, SearchText);
