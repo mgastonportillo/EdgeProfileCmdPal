@@ -1,4 +1,5 @@
-﻿using Microsoft.CommandPalette.Extensions.Toolkit;
+﻿using EdgeProfileCmdPal.Models;
+using Microsoft.CommandPalette.Extensions.Toolkit;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -7,12 +8,12 @@ namespace EdgeProfileCmdPal.Commands
 {
     internal sealed partial class OpenCommand : InvokableCommand
     {
-        public override string Name => $"Open {_profileName}";
-        private readonly string _profileName;
+        public override string Name => $"Open {_profile.Name}";
+        private readonly EdgeProfile _profile;
 
-        public OpenCommand(string profileName)
+        public OpenCommand(EdgeProfile profile)
         {
-            _profileName = profileName;
+            _profile = profile;
         }
 
         public override CommandResult Invoke()
@@ -31,7 +32,7 @@ namespace EdgeProfileCmdPal.Commands
                 Process.Start(new ProcessStartInfo
                 {
                     FileName = edgeExecutablePath,
-                    Arguments = $"--profile-directory=\"{_profileName}\"",
+                    Arguments = _profile.CommandArgs,
                     UseShellExecute = true
                 });
             }

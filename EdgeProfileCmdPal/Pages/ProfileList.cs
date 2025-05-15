@@ -1,5 +1,6 @@
 using EdgeProfileCmdPal.Commands;
 using EdgeProfileCmdPal.Helpers;
+using EdgeProfileCmdPal.Models;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
 using System;
@@ -49,33 +50,41 @@ internal sealed partial class ProfileList : ListPage
                 .EnumerateObject()
                 .Select(profile =>
                 {
-                    string profilePath = profile.Name;
-                    string profileDir = Path.Combine(edgeDataFolder, profilePath);
+                    string profileBasename = profile.Name;
+                    string profilePath = Path.Combine(edgeDataFolder, profileBasename);
 
-                    if (!Directory.Exists(profileDir))
+                    if (!Directory.Exists(profilePath))
                     {
-                        return null; // Skip profiles without a valid directory
+                        return null;
                     }
 
                     var profileData = profile.Value;
-                    string profileName = profileData.GetProperty("name").GetString() ?? profilePath;
 
                     // Handle icon
                     string iconFileName = profileData.TryGetProperty("gaia_picture_file_name", out var iconProp) && iconProp.ValueKind == JsonValueKind.String
                         ? iconProp.GetString() ?? "Edge Profile Picture.png"
                         : "Edge Profile Picture.png";
-                    string iconPath = Path.Combine(profileDir, iconFileName);
+                    string iconPath = Path.Combine(profilePath, iconFileName);
                     string roundIconPath = ImageHelpers.ClipToCircle(iconPath);
                     var profileIcon = new IconInfo(roundIconPath);
 
-                    return new ListItem(new OpenCommand(profilePath))
+                    var edgeProfile = new EdgeProfile
                     {
-                        Title = profileName,
-                        Subtitle = profilePath,
-                        Icon = profileIcon
+                        Name = profileData.GetProperty("name").GetString() ?? profileBasename,
+                        Basename = profileBasename,
+                        Path = profilePath,
+                        Icon = profileIcon,
+                        CommandArgs = $"--profile-directory=\"{profileBasename}\"",
+                    };
+
+                    return new ListItem(new OpenCommand(edgeProfile))
+                    {
+                        Title = edgeProfile.Name,
+                        Subtitle = edgeProfile.Basename,
+                        Icon = edgeProfile.Icon,
                     };
                 })
-                .Where(item => item != null) // Remove null entries
+                .Where(item => item != null)
                 .Cast<ListItem>() // Cast as List<ListItem> (probably unsafe)
                 .ToList();
 
