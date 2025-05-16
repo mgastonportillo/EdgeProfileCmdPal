@@ -1,6 +1,6 @@
 <div align="center">
 
-# ![EdgeProfileLogo](EdgeProfileCmdPal/Assets/EdgeProfile.png) Edge Profile for CmdPal
+# ![EdgeProfileLogo](EdgeProfileCmdPal/Assets/StoreLogo.scale-100.png) Edge Profile for CmdPal
 
 Edge Profile is an extension for [PowerToys Command Palette (CmdPal)](https://learn.microsoft.com/en-us/windows/powertoys/command-palette/overview).  
 It allows you to start Edge Browser leveraging `--profile-directory` to open your existing profiles.
